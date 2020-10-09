@@ -602,7 +602,7 @@ router.post('/contactindex', function(req,res){
                 'success_msg',
                 'Your message has been sent'
             );
-            res.render('index',{user: req.user});
+            res.redirect('/');
         })
         .catch(err => console.log(err));
     }
