@@ -57,6 +57,14 @@
 				</button>
 			</div>
 		<% } %>
+		<% if(success_msg != ''){ %>
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<%= success_msg %>
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		<% } %>
 		<section id="banner">
 			<div class="inner">
 				<h1>सब local: <span>Support And Benefit from Local</span></h1>
@@ -191,6 +199,16 @@
 
         <!-- shopnow -->
 		<section id="shopnow">
+			<% if(typeof errors != 'undefined') { %>
+				<% errors.forEach(function(error) { %>
+					<div class="alert alert-warning alert-dismissible fade show" role="alert">
+						<%= error.msg %>
+						<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+				<% }); %>
+			<% } %>
 			<div class="inner">
 				<header>
 					<h2>SHOP NOW/SEARCH SHOP<br></h2><br>

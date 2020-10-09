@@ -375,14 +375,42 @@ router.post('/filterpincode',function(req,res)
 /***************************** Area Filter *****************************/
 router.post('/filterarea',function(req,res)
 {
-    Shopowner.find({pincode:req.body.pincode,area:req.body.area},function(err,data)
+    if(!req.body.area)
     {
-        if(err)
+        let errors=[];
+        errors.push({ msg: 'Please enter a valid area' });
+        Shopowner.find({pincode:req.body.pincode},function(err,data)
         {
-            process.exit(1);
-        }
-        res.render('shopslist',{data:data,user:req.user});
-    })
+            if(err)
+            {
+                process.exit(1);
+            }
+            //console.log(data.length);
+            let set=new Set();
+            for(let i=0;i<data.length;i++)
+            {
+                set.add(data[i].area);
+            }
+            let pcode={
+                pc:req.body.pincode
+            };
+            let val=Array.from(set);
+            val.sort();
+            res.render('index-1',{errors,val:val,pcode:pcode,user:req.user});
+        })
+    }
+    else
+    {
+        Shopowner.find({pincode:req.body.pincode,area:req.body.area},function(err,data)
+        {
+            if(err)
+            {
+                process.exit(1);
+            }
+            res.render('shopslist',{data:data,user:req.user});
+        })
+    }
+    
 });
 
 
@@ -528,7 +556,7 @@ router.post('/reducecount',urlencodedParser,function(req,res){
    });
 });
 
-// ************************ Contact Us from index *******************************
+// ************************ Contact Us from index/index-1 *******************************
 router.post('/contactindex', function(req,res){
     
     const { username, useremail, message } = req.body;
@@ -569,138 +597,5 @@ router.post('/contactindex', function(req,res){
         .catch(err => console.log(err));
     }
 });
-
-// // ************************ Contact Us from shopslist *******************************
-// router.post('/contactshoplist', function(req,res){
-    
-//     const { username, useremail, message,data} = req.body;
-//     //console.log(req.body.username);
-//     //console.log(req.body.useremail);
-//     //console.log(req.body.message);
-//     let errors = [];
-    
-//     // Check required fields
-//     if(!username || !useremail || !message ){
-//         errors.push({msg: 'Please fill in all fields'});
-//     }
-    
-//     if (errors.length > 0) {
-//         res.render('shopslist', {
-//             errors,
-//             username,
-//             useremail,
-//             message,
-//             data:data,
-//             user:req.user
-//         });
-//     }
-//     else{
-//         const newContact = new Contact({
-//             username,
-//             useremail,
-//             message,
-            
-//         });
-//         //Save Contact
-//         newContact.save()
-//         .then(contact => {
-//             req.flash(
-//                 'success_msg',
-//                 'Your message has been sent'
-//             );
-//             res.render('shopslist',{data:data,user:req.user});
-//         })
-//         .catch(err => console.log(err));
-//     }
-// });
-
-// // // ************************ Contact Us from shopsearch *******************************
-// router.post('/contactshopsearch', function(req,res){
-    
-//     const { username, useremail, message } = req.body;
-//     //console.log(req.body.username);
-//     //console.log(req.body.useremail);
-//     //console.log(req.body.message);
-//     let errors = [];
-    
-//     // Check required fields
-//     if(!username || !useremail || !message ){
-//         errors.push({msg: 'Please fill in all fields'});
-//     }
-    
-//     if (errors.length > 0) {
-//         res.render('shopsearch', {
-//             errors,
-//             username,
-//             useremail,
-//             message,
-//             data:data,
-//             user:req.user
-//         });
-//     }
-//     else{
-//         const newContact = new Contact({
-//             username,
-//             useremail,
-//             message,
-            
-//         });
-//         //Save Contact
-//         newContact.save()
-//         .then(contact => {
-//             req.flash(
-//                 'success_msg',
-//                 'Your message has been sent'
-//             );
-//             res.render('shopsearch',{data:data,user:req.user});
-//         })
-//         .catch(err => console.log(err));
-//     }
-// });
-
-// // // ************************ Contact Us from myshop *******************************
-// router.post('/contactmyshop', function(req,res){
-    
-//     const { username, useremail, message } = req.body;
-//     //console.log(req.body.username);
-//     //console.log(req.body.useremail);
-//     //console.log(req.body.message);
-//     let errors = [];
-    
-//     // Check required fields
-//     if(!username || !useremail || !message ){
-//         errors.push({msg: 'Please fill in all fields'});
-//     }
-    
-//     if (errors.length > 0) {
-//         res.render('myshop', {
-//             errors,
-//             username,
-//             useremail,
-//             message,
-//             data:data,
-//             user:req.user
-//         });
-//     }
-//     else{
-//         const newContact = new Contact({
-//             username,
-//             useremail,
-//             message,
-            
-//         });
-//         //Save Contact
-//         newContact.save()
-//         .then(contact => {
-//             req.flash(
-//                 'success_msg',
-//                 'Your message has been sent'
-//             );
-//             res.render('myshop',{data:data,user:req.user});
-//         })
-//         .catch(err => console.log(err));
-//     }
-// });
-
 
 module.exports = router;
