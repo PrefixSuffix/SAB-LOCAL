@@ -41,7 +41,22 @@
 			</div>
 		</header>
 		<a href="#menu" class="navPanelToggle"><span class="fa fa-bars"></span></a>
-
+		<% if(success != ''){ %>
+			<div class="alert alert-success alert-dismissible fade show" role="alert">
+				<%= success %>
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		<% } %>
+		<% if(error != ''){ %>
+			<div class="alert alert-danger alert-dismissible fade show" role="alert">
+				<%= error %>
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+		<% } %>
 		<section id="banner">
 			<div class="inner">
 				<h1>सब local: <span>Support And Benefit from Local</span></h1>
@@ -238,7 +253,7 @@
 				<header>
 					<h2>CONTACT US<br><br></h2>
 				</header>
-				<form method="post" action="/contact1">
+				<form method="post" action="/contactindex">
 					<div class="field half first">
 						<label for="username">Name</label>
 						<input type="text" name="username" id="username" />

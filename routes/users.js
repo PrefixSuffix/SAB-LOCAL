@@ -8,6 +8,7 @@ const { ensureAuthenticated } = require('../config/auth.js');
 const User = require('../models/User');
 const Shopowner = require('../models/Shopowner');
 const Donation = require('../models/Donation');
+const Contact = require('../models/Contact');
 
 
 const bodyParser = require('body-parser');
@@ -28,6 +29,14 @@ router.get('/formaddshop', ensureAuthenticated, (req, res) => res.render('formad
 
 // Donation Page
 router.get('/formdonate', (req, res) => res.render('formdonate'));
+
+// MyShop page
+router.get('/myshop' , ensureAuthenticated , (req , res) => {
+    Shopowner.find({email: req.user.email} , (err , data) => {
+        if(err) throw err;
+        res.render('myshop' , {data: data,user:req.user});
+    });
+});
 
 
 
@@ -460,6 +469,238 @@ router.post('/addqueuepage',urlencodedParser, ensureAuthenticated , function(req
         });
     }
 });
+
+
+/***************************** Editing About of the Shop *****************************/
+router.post('/editabout',urlencodedParser,function(req,res){
+    let newobj={
+       aboutshop:req.body.newaboutshop
+    };
+    Shopowner.findOneAndUpdate({pincode:req.body.pincode,area:req.body.area,shopname:req.body.shopname},
+    newobj,
+    function(err, docs)
+    {
+        if(err)
+        {
+            res.json(err);
+        }
+        else
+        {
+            Shopowner.find({pincode:req.body.pincode,area:req.body.area,shopname:req.body.shopname},function(err,data)
+            {
+                if(err)
+                {
+                    process.exit(1);
+                }
+                res.render('myshop',{data:data,user:req.user});
+            })
+        }
+   });
+});
+
+/***************************** Reducing count of the queue *****************************/
+router.post('/reducecount',urlencodedParser,function(req,res){
+  console.log(req.body);
+    Shopowner.findOneAndUpdate({pincode:req.body.pincode,area:req.body.area,shopname:req.body.shopname},
+    {
+        $pop: {phoneNumbers:-1,items:-1}
+    },
+    function(err, docs)
+    {
+        if(err)
+        {
+            res.json(err);
+        }
+        else
+        {
+          Shopowner.find({pincode:req.body.pincode,area:req.body.area,shopname:req.body.shopname},function(err,data)
+          {
+              if(err)
+              {
+                  process.exit(1);
+              }
+              if(data[0].items.length > 1) {
+                const response = fast2sms.sendMessage({authorization: process.env.API_KEY , message: `This is a reminder message. You can leave for the shop 7 minutes later from the time of receiveing this message. In case you are not able to reach the shop within 14 minutes, your registration will be cancelled. Regards, Team 5-&-dime` , numbers: [data[0].phoneNumbers[1]]});
+              }
+              res.render('myshop',{data:data,user:req.user});
+          })
+        }
+   });
+});
+
+// ************************ Contact Us from index *******************************
+router.post('/contactindex', function(req,res){
+    
+    const { username, useremail, message } = req.body;
+    //console.log(req.body.username);
+    //console.log(req.body.useremail);
+    //console.log(req.body.message);
+    let errors = [];
+    
+    // Check required fields
+    if(!username || !useremail || !message ){
+        errors.push({msg: 'Please fill in all fields'});
+    }
+    
+    if (errors.length > 0) {
+        res.render('index', {
+            errors,
+            username,
+            useremail,
+            message,
+            user: req.user
+        });
+    }
+    else{
+        const newContact = new Contact({
+            username,
+            useremail,
+            message
+        });
+        //Save Contact
+        newContact.save()
+        .then(contact => {
+            req.flash(
+                'success_msg',
+                'Your message has been sent'
+            );
+            res.render('index',{user: req.user});
+        })
+        .catch(err => console.log(err));
+    }
+});
+
+// // ************************ Contact Us from shopslist *******************************
+// router.post('/contactshoplist', function(req,res){
+    
+//     const { username, useremail, message,data} = req.body;
+//     //console.log(req.body.username);
+//     //console.log(req.body.useremail);
+//     //console.log(req.body.message);
+//     let errors = [];
+    
+//     // Check required fields
+//     if(!username || !useremail || !message ){
+//         errors.push({msg: 'Please fill in all fields'});
+//     }
+    
+//     if (errors.length > 0) {
+//         res.render('shopslist', {
+//             errors,
+//             username,
+//             useremail,
+//             message,
+//             data:data,
+//             user:req.user
+//         });
+//     }
+//     else{
+//         const newContact = new Contact({
+//             username,
+//             useremail,
+//             message,
+            
+//         });
+//         //Save Contact
+//         newContact.save()
+//         .then(contact => {
+//             req.flash(
+//                 'success_msg',
+//                 'Your message has been sent'
+//             );
+//             res.render('shopslist',{data:data,user:req.user});
+//         })
+//         .catch(err => console.log(err));
+//     }
+// });
+
+// // // ************************ Contact Us from shopsearch *******************************
+// router.post('/contactshopsearch', function(req,res){
+    
+//     const { username, useremail, message } = req.body;
+//     //console.log(req.body.username);
+//     //console.log(req.body.useremail);
+//     //console.log(req.body.message);
+//     let errors = [];
+    
+//     // Check required fields
+//     if(!username || !useremail || !message ){
+//         errors.push({msg: 'Please fill in all fields'});
+//     }
+    
+//     if (errors.length > 0) {
+//         res.render('shopsearch', {
+//             errors,
+//             username,
+//             useremail,
+//             message,
+//             data:data,
+//             user:req.user
+//         });
+//     }
+//     else{
+//         const newContact = new Contact({
+//             username,
+//             useremail,
+//             message,
+            
+//         });
+//         //Save Contact
+//         newContact.save()
+//         .then(contact => {
+//             req.flash(
+//                 'success_msg',
+//                 'Your message has been sent'
+//             );
+//             res.render('shopsearch',{data:data,user:req.user});
+//         })
+//         .catch(err => console.log(err));
+//     }
+// });
+
+// // // ************************ Contact Us from myshop *******************************
+// router.post('/contactmyshop', function(req,res){
+    
+//     const { username, useremail, message } = req.body;
+//     //console.log(req.body.username);
+//     //console.log(req.body.useremail);
+//     //console.log(req.body.message);
+//     let errors = [];
+    
+//     // Check required fields
+//     if(!username || !useremail || !message ){
+//         errors.push({msg: 'Please fill in all fields'});
+//     }
+    
+//     if (errors.length > 0) {
+//         res.render('myshop', {
+//             errors,
+//             username,
+//             useremail,
+//             message,
+//             data:data,
+//             user:req.user
+//         });
+//     }
+//     else{
+//         const newContact = new Contact({
+//             username,
+//             useremail,
+//             message,
+            
+//         });
+//         //Save Contact
+//         newContact.save()
+//         .then(contact => {
+//             req.flash(
+//                 'success_msg',
+//                 'Your message has been sent'
+//             );
+//             res.render('myshop',{data:data,user:req.user});
+//         })
+//         .catch(err => console.log(err));
+//     }
+// });
 
 
 module.exports = router;
