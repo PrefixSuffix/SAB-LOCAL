@@ -191,11 +191,11 @@ router.post('/formaddshop',ensureAuthenticated, (req, res) =>{
     }
     else
     {
-        Shopowner.findOne({ shopname:shopname }).then(shopowner =>
+        Shopowner.findOne({ pincode:pincode,area:area,shopname:shopname }).then(shopowner =>
         {
             if (shopowner)
             {
-                errors.push({ msg: 'Shop name already exists' });
+                errors.push({ msg: 'Shop already exists' });
                 res.render('formaddshop', {
                     errors,
                     shopname,
