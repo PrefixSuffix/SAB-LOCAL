@@ -436,18 +436,21 @@ router.post('/addqueuepage',urlencodedParser, ensureAuthenticated , function(req
     let errors=[];
     if (!phoneNumbers)
     {
-        errors.push({ msg: 'Please fill in your mobile number' });
+        errors.push({ msg: 'Please enter your mobile number' });
     }
     else if(phoneNumbers.length !=10)
     {
-        errors.push({ msg: 'Please fill valid mobile number' });
+        errors.push({ msg: 'Please enter valid mobile number' });
     }
-    for(var i=0;i<phoneNumbers.length;i++)
+    else
     {
-        if(phoneNumbers[i]<'0' || phoneNumbers[i]>'9')
+        for(var i=0;i<phoneNumbers.length;i++)
         {
-            errors.push({ msg: 'Please fill valid phone number' });
-            break;
+            if(phoneNumbers[i]<'0' || phoneNumbers[i]>'9')
+            {
+                errors.push({ msg: 'Please enter valid mobile number' });
+                break;
+            }
         }
     }
     if (errors.length > 0) {
@@ -474,17 +477,24 @@ router.post('/addqueuepage',urlencodedParser, ensureAuthenticated , function(req
             {
                 Shopowner.find({pincode:req.body.pincode,area:req.body.area,shopname:req.body.shopname},function(err,data)
                 {
-                    try {
+                    var pos = (data[0].items.length);
+                    try{
                         if(data[0].items.length == 1) {
-                            const response = fast2sms.sendMessage({authorization: process.env.API_KEY, sender_id: 'SABLCL', message: `You have been added successfully to the queue at ${data[0].shopname}. It's your turn. You can leave for the shop now. In case you are not able to reach the shop within 7 minutes from the time of receiving this message, your registration will be cancelled. Regards, Team 5-&-dime` , numbers: [req.body.phonenumber]});
+                            const response = fast2sms.sendMessage({authorization: process.env.API_KEY, sender_id: 'SABLCL', message: `You have been added successfully to the queue at ${data[0].shopname}. Your position in the queue is ${pos}. You should reach the shop within 7 minutes else your registration will be cancelled. 
+Regards
+SAB LOCAL` , numbers: [req.body.phonenumber]});
                         }
                         else if(data[0].items.length == 2) {
-                            const response = fast2sms.sendMessage({authorization: process.env.API_KEY, sender_id: 'SABLCL', message: `You have been added successfully to the queue at ${data[0].shopname}. You can leave for the shop 7 minutes later from the time of receiveing this message. In case you are not able to reach the shop within 14 minutes, your registration will be cancelled. Regards, Team 5-&-dime` , numbers: [req.body.phonenumber]});
+                            const response = fast2sms.sendMessage({authorization: process.env.API_KEY, sender_id: 'SABLCL', message: `You have been added successfully to the queue at ${data[0].shopname}. Your position in the queue is ${pos}. You should reach the shop within 7-14 minutes from now else your registration will be cancelled. 
+Regards
+SAB LOCAL` , numbers: [req.body.phonenumber]});
                         }
                         else {
                             var exptime = (data[0].items.length - 1) * 7;
                             //console.log(exptime);
-                            const response = fast2sms.sendMessage({authorization: process.env.API_KEY, sender_id: 'SABLCL', message: `You have been added successfully to the queue at ${data[0].shopname}. Your expected time is ${exptime} minutes from now. You will be notified once again about the exact time. Regards, Team 5-&-dime` , numbers: [req.body.phonenumber]});
+                            const response = fast2sms.sendMessage({authorization: process.env.API_KEY, sender_id: 'SABLCL', message: `You have been added successfully to the queue at ${data[0].shopname}. Your position in the queue is ${pos}. Your expected time is ${exptime} minutes from now. You will be notified once again about the exact time. 
+Regards
+SAB LOCAL` , numbers: [req.body.phonenumber]});
                         }
                         res.render('shopsearch',{data:data,user:req.user});
                     }
@@ -592,7 +602,7 @@ router.post('/contactindex', function(req,res){
                 'success_msg',
                 'Your message has been sent'
             );
-            res.render('index',{user: req.user});
+            res.redirect('/');
         })
         .catch(err => console.log(err));
     }
