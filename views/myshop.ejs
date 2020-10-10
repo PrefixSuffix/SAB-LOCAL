@@ -44,17 +44,19 @@
             <%- include("./messages") %>
             <section id="main">
                 <div class="inner">
-                    <header class="major special">
-						<h1><%=data[0].shopname%></h1>
-						<br>
-					</header>
-
+					<div class="row mb-5 justify-content-center">
+						<div class="col-md-6 text-center">
+							<header class="major special">
+								<h1>My Shop: <%=data[0].shopname%></h1>
+								<br>
+							<h5>Shop Owner's Name: <%=data[0].ownername%></h5>
+							</header>
+						</div>
+					</div>
 					<!-- Text -->
 					<section>
-						<p><b>Shop Owner Name: <%=data[0].ownername%></b> </p>
-						<br>
 						<form action="/editabout" method="POST">
-							 <p><b>About Shop & offers:</b></p>
+							 <p>About Shop & offers:</p>
 							 <input type="hidden" name="shopname" value="<%=data[0].shopname%>">
 							 <input type="hidden" name="pincode" value="<%=data[0].pincode%>">
 							 <input type="hidden" name="area" value="<%=data[0].area%>">
@@ -66,7 +68,7 @@
                     <br>
                     <ul class="alt">
                         <!-- <li></li> -->
-                        <b><p>Live Current customer count: <%=data[0].items.length%><span></span></p></b>
+                        <p>Live Current customer count: <b><%=data[0].items.length%><span></span></p></b>
                     </ul>
                     <section >
                         <form method="post" action="/reducecount">
@@ -82,7 +84,7 @@
 												<br>
 												<ul class="alt">
 													<%for(let i=0;i<data[0].items.length;i++){%>
-					                    <li><p><b><%=i+1%>. Customer Phone No: <%=data[0].phoneNumbers[i]%></b> <span></span></p></li>
+					                    <li><p><%=i+1%>. Customer Phone No: <b><%=data[0].phoneNumbers[i]%></b> <span></span></p></li>
 															<div class="field">
 																<label for="listofitems">List of items</label>
 																<textarea name="listofitems" id="listofitems" rows="1"><%=data[0].items[i]%></textarea>
