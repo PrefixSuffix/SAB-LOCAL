@@ -558,7 +558,9 @@ router.post('/reducecount',urlencodedParser,function(req,res){
                   process.exit(1);
               }
               if(data[0].items.length > 1) {
-                const response = fast2sms.sendMessage({authorization: process.env.API_KEY , message: `This is a reminder message. You can leave for the shop 7 minutes later from the time of receiveing this message. In case you are not able to reach the shop within 14 minutes, your registration will be cancelled. Regards, Team 5-&-dime` , numbers: [data[0].phoneNumbers[1]]});
+                const response = fast2sms.sendMessage({authorization: process.env.API_KEY, sender_id: 'SABLCL', message: `This is a reminder message. Your current position in the queue at ${data[0].shopname} is 2. You should reach the shop within 7-14 minutes from now else your registration will be cancelled.
+Regards
+SAB LOCAL` , numbers: [data[0].phoneNumbers[1]]}); 
               }
               res.render('myshop',{data:data,user:req.user});
           })
